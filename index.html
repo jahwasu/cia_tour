@@ -184,14 +184,14 @@ async function doVote(){
   b.disabled=true;b.textContent="⏳ 투표 중...";
   m.className="sm ld";m.textContent="투표를 기록하고 있습니다...";
   try{
-    var resp=await fetch(SU,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({name:n,choice:s_,choiceLabel:LB[s_],suggestion:sg})});
-    var result=await resp.json();
+    var params=new URLSearchParams({action:"vote",name:n,choice:s_,choiceLabel:LB[s_],suggestion:sg});
+    await fetch(SU+"?"+params.toString(),{mode:"no-cors"});
     done=true;b.textContent="✅ 투표 완료!";b.style.background="linear-gradient(135deg,#059669,#047857)";
     m.className="sm ok";m.textContent=n+"님의 투표가 접수되었습니다! 감사합니다 🎉";
-    boom();setTimeout(getRes,1500);
+    boom();setTimeout(getRes,2000);
   }catch(e){
     b.disabled=false;b.className="btn rdy";b.textContent="🗳 다시 시도하기";
-    m.className="sm er";m.textContent="오류가 발생했습니다. 다시 시도해주세요.";
+    m.className="sm er";m.textContent="네트워크 오류입니다. 인터넷 연결을 확인해주세요.";
   }
 }
 function getRes(){
