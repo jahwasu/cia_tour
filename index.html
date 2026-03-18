@@ -175,7 +175,7 @@ function sel(o){
   else{p.className="sp spb";t.className="am";t.textContent="✅ "+LB[o]+" 선택됨";}
   var b=document.getElementById("sbtn");b.className="btn rdy";b.textContent="🗳 투표하기";
 }
-async function doVote(){
+function doVote(){
   if(!s_||done)return;
   var n=document.getElementById("vname").value.trim();
   if(!n){alert("이름을 입력해주세요 😊");document.getElementById("vname").focus();return;}
@@ -183,16 +183,21 @@ async function doVote(){
   var b=document.getElementById("sbtn"),m=document.getElementById("smsg");
   b.disabled=true;b.textContent="⏳ 투표 중...";
   m.className="sm ld";m.textContent="투표를 기록하고 있습니다...";
-  try{
-    var params=new URLSearchParams({action:"vote",name:n,choice:s_,choiceLabel:LB[s_],suggestion:sg});
-    await fetch(SU+"?"+params.toString(),{mode:"no-cors"});
-    done=true;b.textContent="✅ 투표 완료!";b.style.background="linear-gradient(135deg,#059669,#047857)";
-    m.className="sm ok";m.textContent=n+"님의 투표가 접수되었습니다! 감사합니다 🎉";
-    boom();setTimeout(getRes,2000);
-  }catch(e){
-    b.disabled=false;b.className="btn rdy";b.textContent="🗳 다시 시도하기";
-    m.className="sm er";m.textContent="네트워크 오류입니다. 인터넷 연결을 확인해주세요.";
-  }
+
+  // hidden iframe 폼 제출 방식 - CORS 문제 원천 차단
+  var fr=document.getElementById("vf");
+  if(!fr){fr=document.createElement("iframe");fr.id="vf";fr.name="vf";fr.style.display="none";document.body.appendChild(fr);}
+  var fm=document.createElement("form");
+  fm.method="GET";fm.action=SU;fm.target="vf";
+  var fields={action:"vote",name:n,choice:s_,choiceLabel:LB[s_],suggestion:sg};
+  Object.keys(fields).forEach(function(k){
+    var inp=document.createElement("input");inp.type="hidden";inp.name=k;inp.value=fields[k];fm.appendChild(inp);
+  });
+  document.body.appendChild(fm);fm.submit();document.body.removeChild(fm);
+
+  done=true;b.textContent="✅ 투표 완료!";b.style.background="linear-gradient(135deg,#059669,#047857)";
+  m.className="sm ok";m.textContent=n+"님의 투표가 접수되었습니다! 감사합니다 🎉";
+  boom();setTimeout(getRes,3000);
 }
 function getRes(){
   fetch(SU+"?t="+Date.now()).then(function(r){return r.json();}).then(function(d){if(d.success)upd(d.counts);}).catch(function(){});
