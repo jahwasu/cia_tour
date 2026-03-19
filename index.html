@@ -54,7 +54,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Apple SD Goth
 .fw{padding:16px;}
 .fc{background:#fff;border-radius:20px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,0.08);}
 .ftit{font-size:18px;font-weight:700;color:#1a1a1a;margin-bottom:14px;text-align:center;}
-.flb{font-size:16px;font-weight:600;color:#444;margin-bottom:6px;display:block;}
+.flb{font-size:17px;font-weight:600;color:#444;margin-bottom:6px;display:block;}
 .fin{width:100%;border:1.5px solid #e5e7eb;border-radius:12px;padding:13px 16px;font-size:17px;outline:none;transition:border-color 0.2s;font-family:inherit;}
 .fin:focus{border-color:#1a6b53;}
 .fta{width:100%;border:1.5px solid #e5e7eb;border-radius:12px;padding:13px 16px;font-size:16px;outline:none;transition:border-color 0.2s;font-family:inherit;resize:vertical;min-height:80px;}
@@ -93,6 +93,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Apple SD Goth
 .vc:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,0.18),0 4px 12px rgba(0,0,0,0.1);}
 .vc.sa{border-color:#1a6b53;box-shadow:0 8px 32px rgba(26,107,83,0.3),0 2px 8px rgba(26,107,83,0.15);transform:translateY(-2px);}
 .vc.sb{border-color:#b45309;box-shadow:0 8px 32px rgba(180,83,9,0.3),0 2px 8px rgba(180,83,9,0.15);transform:translateY(-2px);}
+
+.attend-wrap{margin-bottom:18px;}
+.attend-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.attend-label{font-size:17px;font-weight:600;color:#444;white-space:nowrap;}
+.attend-req{color:#dc2626;margin-left:2px;}
+.toggle-group{display:flex;background:#f0ede8;border-radius:12px;padding:4px;gap:4px;}
+.toggle-btn{padding:10px 18px;border:none;border-radius:9px;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.22s cubic-bezier(0.25,0.46,0.45,0.94);color:#888;background:transparent;font-family:inherit;white-space:nowrap;}
+.toggle-btn.active-y{background:#1a6b53;color:#fff;box-shadow:0 2px 8px rgba(26,107,83,0.3);}
+.toggle-btn.active-n{background:#888;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.15);}
+.toggle-btn.active-none{background:#e5e7eb;color:#6b7280;box-shadow:none;}
+.couple-wrap{overflow:hidden;max-height:0;opacity:0;transition:max-height 0.35s ease,opacity 0.3s ease,margin-top 0.3s ease;margin-top:0;}
+.couple-wrap.show{max-height:80px;opacity:1;margin-top:12px;}
+.couple-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.couple-label{font-size:17px;font-weight:600;color:#444;white-space:nowrap;}
+.toggle-btn.active-a{background:#1a6b53;color:#fff;box-shadow:0 2px 8px rgba(26,107,83,0.3);}
+.toggle-btn.active-b{background:#b45309;color:#fff;box-shadow:0 2px 8px rgba(180,83,9,0.3);}
 </style>
 </head>
 <body>
@@ -225,9 +241,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Apple SD Goth
 <div class="fw"><div class="fc">
   <div class="ftit">📝 투표 참여하기</div>
   <div id="sp" class="sp"><span id="stxt"></span></div>
-  <div class="fg"><label class="flb">이름 <span style="color:#dc2626;">*</span></label><input class="fin" type="text" id="vname" placeholder="이름을 입력하세요" maxlength="20"/></div>
+  <div class="attend-wrap">
+    <div class="attend-row">
+      <span class="attend-label">참석 여부</span>
+      <div class="toggle-group">
+        <button class="toggle-btn active-none" id="tbtn-attend-none" onclick="setAttend(null)">선택안함</button>
+        <button class="toggle-btn" id="tbtn-attend-y" onclick="setAttend('y')">참석</button>
+        <button class="toggle-btn" id="tbtn-attend-n" onclick="setAttend('n')">불참</button>
+      </div>
+    </div>
+    <div class="couple-wrap" id="couple-wrap">
+      <div class="couple-row">
+        <span class="couple-label">동반 여부</span>
+        <div class="toggle-group">
+          <button class="toggle-btn" id="tbtn-couple" onclick="setCouple('y')">부부동반</button>
+          <button class="toggle-btn" id="tbtn-solo" onclick="setCouple('n')">개인참석</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fg" id="name-field">
+    <label class="flb">이름</label>
+    <div style="position:relative;">
+      <input class="fin" type="text" id="vname" placeholder="이름을 입력하세요" maxlength="20"/>
+      <span id="name-lock" style="display:none;position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:15px;color:#1a6b53;">✓ 자동입력</span>
+    </div>
+    <p id="name-hint" style="display:none;font-size:13px;color:#1a6b53;margin-top:4px;">링크로 자동 입력되었습니다. 수정도 가능합니다.</p>
+  </div>
   <div class="fg"><label class="flb">건의사항 <span style="color:#9ca3af;font-weight:400;">(선택)</span></label><textarea class="fta" id="sug" placeholder="여행에 관한 건의사항이 있으시면 자유롭게 남겨주세요 😊"></textarea></div>
-  <button class="btn dis" id="sbtn" onclick="doVote()">코스를 먼저 선택해주세요</button>
+  <button class="btn dis" id="sbtn" onclick="doVote()">인원에 따라 코스는 일부 변경될 수 있습니다.</button>
   <div class="sm" id="smsg"></div>
 </div></div>
 <div class="rw"><div class="rc">
@@ -239,6 +281,36 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Apple SD Goth
 </div></div>
 <div class="footer">CIA 자치회 · 2026 봄 역사기행<br>문의: 자치회 임원단</div>
 <script>
+var attend_=null,couple_=null;
+function setAttend(v){
+  attend_=v;
+  var ay=document.getElementById('tbtn-attend-y');
+  var an=document.getElementById('tbtn-attend-n');
+  var anone=document.getElementById('tbtn-attend-none');
+  var cw=document.getElementById('couple-wrap');
+  ay.className='toggle-btn';
+  an.className='toggle-btn';
+  anone.className='toggle-btn';
+  if(v==='y'){ay.className='toggle-btn active-y';cw.classList.add('show');}
+  else if(v==='n'){an.className='toggle-btn active-n';cw.classList.remove('show');couple_=null;document.getElementById('tbtn-couple').className='toggle-btn';document.getElementById('tbtn-solo').className='toggle-btn';}
+  else{anone.className='toggle-btn active-none';cw.classList.remove('show');couple_=null;document.getElementById('tbtn-couple').className='toggle-btn';document.getElementById('tbtn-solo').className='toggle-btn';}
+  updateBtn();
+}
+function setCouple(v){
+  couple_=v;
+  var btnCouple=document.getElementById('tbtn-couple');
+  var btnSolo=document.getElementById('tbtn-solo');
+  if(v==='y'){btnCouple.className='toggle-btn active-a';btnSolo.className='toggle-btn';}
+  else{btnSolo.className='toggle-btn active-b';btnCouple.className='toggle-btn';}
+  updateBtn();
+}
+function updateBtn(){
+  var b=document.getElementById('sbtn');
+  if(!s_){b.className='btn dis';b.textContent='인원에 따라 코스는 일부 변경될 수 있습니다.';return;}
+  if(!attend_){b.className='btn dis';b.textContent='참석 여부를 선택해주세요';return;}
+  if(attend_==='y'&&!couple_){b.className='btn dis';b.textContent='동반 여부를 선택해주세요';return;}
+  b.className='btn rdy';b.textContent='🗳 투표하기';
+}
 var SU="https://script.google.com/macros/s/AKfycbxFzawPqrvubQpW-woCa9HVYZvkD-4m4qnhPPyjB9RD7o6sVLRDa-KNLxONcGpLdtab/exec";
 var LB={A:"제1안 호국과 충절 코스",B:"제2안 수행과 풍류 코스"};
 var s_=null,done=false;
@@ -251,10 +323,12 @@ function sel(o){
   var p=document.getElementById("sp"),t=document.getElementById("stxt");
   if(o==="A"){p.className="sp spa";t.className="";t.textContent="✅ "+LB[o]+" 선택됨";}
   else{p.className="sp spb";t.className="am";t.textContent="✅ "+LB[o]+" 선택됨";}
-  var b=document.getElementById("sbtn");b.className="btn rdy";b.textContent="🗳 투표하기";
+  updateBtn();
 }
 function doVote(){
   if(!s_||done)return;
+  if(!attend_){alert("참석 여부를 선택해주세요 😊");return;}
+  if(attend_==='y'&&!couple_){alert("동반 여부를 선택해주세요 😊");return;}
   var n=document.getElementById("vname").value.trim();
   if(!n){alert("이름을 입력해주세요 😊");document.getElementById("vname").focus();return;}
   var sg=document.getElementById("sug").value.trim();
@@ -267,7 +341,9 @@ function doVote(){
   if(!fr){fr=document.createElement("iframe");fr.id="vf";fr.name="vf";fr.style.display="none";document.body.appendChild(fr);}
   var fm=document.createElement("form");
   fm.method="GET";fm.action=SU;fm.target="vf";
-  var fields={action:"vote",name:n,choice:s_,choiceLabel:LB[s_],suggestion:sg};
+  var attendLabel=attend_==='y'?'참석':'불참';
+  var coupleLabel=attend_==='y'?(couple_==='y'?'부부동반':'개인참석'):'';
+  var fields={action:"vote",name:n,choice:s_,choiceLabel:LB[s_],attend:attendLabel,couple:coupleLabel,suggestion:sg};
   Object.keys(fields).forEach(function(k){
     var inp=document.createElement("input");inp.type="hidden";inp.name=k;inp.value=fields[k];fm.appendChild(inp);
   });
@@ -306,5 +382,18 @@ function boom(){
     document.body.appendChild(e);setTimeout(function(){if(e.parentNode)e.parentNode.removeChild(e);},4000);
   })();}
 }
+// URL 파라미터에서 이름 자동입력
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  var name = params.get('name') || params.get('n');
+  if(name) {
+    var el = document.getElementById('vname');
+    el.value = decodeURIComponent(name);
+    el.style.background = '#f0fdf4';
+    el.style.borderColor = '#1a6b53';
+    document.getElementById('name-lock').style.display = 'inline';
+    document.getElementById('name-hint').style.display = 'block';
+  }
+})();
 getRes();
 </script></body></html>
